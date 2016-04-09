@@ -2,3 +2,4 @@
 *.tsv
 *.zip
 *.txt
+.DS_Store

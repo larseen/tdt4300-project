@@ -1,15 +1,21 @@
 from pyspark import SparkContext
 from datetime import datetime, timedelta
 from operator import add
+from operator import concat
+from collections import Counter
 
 sc = SparkContext("local", "tdt4300")
 rawData = sc.textFile("../dataset_TIST2015.tsv", use_unicode=False)
 
 header = rawData.first()
 data = rawData.filter(lambda x: x != header)
+
 dataWithoutWhite = data.map(lambda x: x.split('\n')[0].split('\t'))
-dataTouples = dataWithoutWhite.map(
-    lambda x: (x[3], x[4]))
-result = dataTouples.map(
-    lambda x: datetime.strptime(x[0], '%Y-%m-%d %H:%M:%S') - timedelta(minutes=int(x[1]))).map(
-    lambda x: str(x))
+
+dataTouples = dataWithoutWhite\
+    .map(lambda x: (x[2], x[0]))\
+    .groupByKey().map(lambda x : (x[0], len(x[1])))\
+    .groupByKey().map(lambda x : (x[1], len(x[0])))\
+
+
+print(dataTouples.collect())
