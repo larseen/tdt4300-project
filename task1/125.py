@@ -15,7 +15,7 @@ dataWithoutWhite = data.map(lambda x: x.split('\n')[0].split('\t'))
 dataTouples = dataWithoutWhite\
     .map(lambda x: (x[2], x[0]))\
     .groupByKey().map(lambda x : (x[0], len(x[1])))\
-    .groupByKey().map(lambda x : (x[1], len(x[0])))\
+    .countByValue().map(lambda x : x[1]).items()\
+    .take(10)\
 
-
-print(dataTouples.collect())
+print(dataTouples)
