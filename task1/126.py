@@ -10,10 +10,11 @@ rawData = sc.textFile("../dataset_TIST2015.tsv", use_unicode=False)
 
 header = rawData.first()
 data = rawData.filter(lambda x: x != header)
+dataWithoutWhite = data.map(lambda x: x.split('\n')[0].split('\t'))
 
 def computeDistance(locations):
     sum_distance = 0
-    for i in range(0, len(locations)- 2, 2):
+    for i in range(0, len(locations) - 1):
         sum_distance += hav(float(locations[i][0]), float(locations[i][1]),
                 float(locations[i+1][0]), float((locations[i+1][1])))
 
@@ -31,13 +32,10 @@ def hav(lat1, lon1, lat2, lon2):
     r = 6371 # Radius of earth in kilometers. Use 3956 for miles
     return c * r
 
-dataWithoutWhite = data.map(lambda x: x.split('\n')[0].split('\t'))
-
-dataTouples = dataWithoutWhite\
+distanceData = dataWithoutWhite\
     .map(lambda x: (x[2], (x[5], x[6])))\
     .groupByKey()\
     .filter(lambda x: len(x[1]) > 3)\
-    .map(lambda x: (x[0], list(x[1])))\
     .map(lambda x: (x[0], computeDistance(list(x[1]))))
 
-print(dataTouples.take(20))
+print distanceData.collect()
