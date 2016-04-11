@@ -13,10 +13,12 @@ positiveWords = []
 negativeWords = []
 with open('../positive-words.txt', 'r') as text_file:
     positiveWords = text_file.read().split('\n')
+    positiveWords = set(positiveWords)
 with open('../negative-words.txt', 'r') as text_file:
     negativeWords = text_file.read().split('\n')
+    negativeWords = set(negativeWords)
 
-sc = SparkContext("local", "tdt4300")
+sc = SparkContext("local[*]", "tdt4300")
 rawData = sc.textFile("../geotweets.tsv", use_unicode=False)
 dataHeader = rawData.first()
 data = rawData\
@@ -47,8 +49,8 @@ def mergeTweets(a, b):
 
 def analyzeTweet(tweets):
     tweetsList = tweets.split(' ')
-    numPos = len(list(set(positiveWords) & set(tweetsList)))
-    numNeg = len(list(set(negativeWords) & set(tweetsList)))
+    numPos = len([i for i in tweetsList if i in positiveWords])
+    numNeg = len([i for i in tweetsList if i in negativeWords])
     return numPos - numNeg
 
 def formatOutput(data):
