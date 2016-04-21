@@ -1,29 +1,30 @@
 from pyspark import  SparkContext
 from datetime import datetime
+import sys
 import re, string
 import calendar
+
+##
+#
+# INPUT ARGUMENTS
+#
+##
+input_file = sys.argv[1]
+output_file = sys.argv[2]
+positive_words = sys.argv[3]
+negative_words = sys.argv[4]
 
 ##
 #
 # INSERT AND PREP DATA
 #
 ##
-
-positiveWords = []
-negativeWords = []
-with open('../positive-words.txt', 'r') as text_file:
-    positiveWords = text_file.read().split('\n')
-    positiveWords = set(positiveWords)
-with open('../negative-words.txt', 'r') as text_file:
-    negativeWords = text_file.read().split('\n')
-    negativeWords = set(negativeWords)
-
-sc = SparkContext("local[*]", "tdt4300")
-rawData = sc.textFile("../geotweets.tsv", use_unicode=False)
-dataHeader = rawData.first()
-data = rawData\
-    .filter(lambda x: x != dataHeader)\
-    .map(lambda x: x.split('\n')[0].split('\t'))\
+positiveWords = sc.textFile(positive_words).collect()
+positiveWords = set(positiveWords)
+negativeWords = sc.textFile(negative_words).collect()
+negativeWords = set(negativeWords)
+rawData = sc.textFile(input_file, use_unicode=False)
+data = rawData.map(lambda x: x.split('\n')[0].split('\t'))\
 
 ##
 #
@@ -68,4 +69,4 @@ tweets = data\
     .combineByKey(str, mergeTweets, mergeTweets)\
     .map(lambda row: (getCity(row[0]), getWeekday(row[0]), analyzeTweet(row[1])))\
     .map(lambda row: formatOutput(row))\
-    .saveAsTextFile("output.tsv")\
+    .saveAsTextFile(output_file)\
