@@ -38,6 +38,6 @@ numCountries = cityData \
         .distinct() \
         .count()
 numCities = cityData \
-        .map(lambda x: x[0]) \
+        .map(lambda x: (x[0], x[4])) \
         .distinct() \
         .count()
