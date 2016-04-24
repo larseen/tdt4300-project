@@ -1,16 +1,20 @@
 import math
+import sys
 from pyspark import SparkContext
 from datetime import datetime, timedelta
 from operator import add
 from operator import concat
 from collections import Counter
 
-sc = SparkContext("local", "tdt4300")
+sc = SparkContext("local[*]", "tdt4300")
 rawData = sc.textFile("../dataset_TIST2015.tsv", use_unicode=False)
 
 header = rawData.first()
 data = rawData.filter(lambda x: x != header)
 dataWithoutWhite = data.map(lambda x: x.split('\n')[0].split('\t'))
+
+def formatOutput(data):
+    return '    '.join(str(d) for d in data)
 
 def computeDistance(locations):
     sum_distance = 0
@@ -33,14 +37,19 @@ def hav(lat1, lon1, lat2, lon2):
     return c * r
 
 userData = dataWithoutWhite\
-    .map(lambda x: (x[2], x[0], x[1], x[3], x[4], x[5], x[6], x[7],
-        x[8]))
+    .map(lambda x: (x[2], (x[0], x[1], x[3], x[4], x[5], x[6], x[7],
+        x[8])))
 
 distanceData = dataWithoutWhite\
     .map(lambda x: (x[2], (x[5], x[6])))\
     .groupByKey()\
-    .map(lambda x: (x[0], computeDistance(list(x[1])), len(list(x[1]))))\
-    .filter(lambda x: x[1] > 50)\
-    .sortBy(lambda x: x[2], ascending=False)\
-    .join(dataWithoutWhite)\
-    .take(20)
+    .map(lambda x: (x[0], (computeDistance(list(x[1])),
+        len(list(x[1])))))\
+    .filter(lambda x: x[1][0] > 50)\
+    .join(userData)\
+    .sortBy(lambda x: x[1][0][1], ascending=False)\
+    .map(lambda x: (x[0], x[1][0][0], x[1][0][1],
+        x[1][1][0],x[1][1][1],x[1][1][2],x[1][1][3],x[1][1][4],x[1][1][5],x[1][1][6],x[1][1][7]))\
+    .map(lambda x: formatOutput(x))\
+    .top(10)
+print distanceData
