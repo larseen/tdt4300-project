@@ -7,7 +7,8 @@ from operator import concat
 from collections import Counter
 
 sc = SparkContext("local[*]", "tdt4300")
-rawData = sc.textFile("../dataset_TIST2015.tsv", use_unicode=False)
+rawData = sc.textFile("../dataset_TIST2015.tsv",
+        use_unicode=False).cache()
 
 header = rawData.first()
 data = rawData.filter(lambda x: x != header)
@@ -43,13 +44,13 @@ userData = dataWithoutWhite\
 distanceData = dataWithoutWhite\
     .map(lambda x: (x[2], (x[5], x[6])))\
     .groupByKey()\
-    .map(lambda x: (x[0], (computeDistance(list(x[1])),
-        len(list(x[1])))))\
-    .filter(lambda x: x[1][0] > 50)\
+    .filter(lambda x: len(x[1]) > 3)\
+    .map(lambda x: (x[0], (computeDistance(list(x[1])))))\
+    .filter(lambda x: x[1] > 50)\
     .join(userData)\
-    .sortBy(lambda x: x[1][0][1], ascending=False)\
-    .map(lambda x: (x[0], x[1][0][0], x[1][0][1],
+    .map(lambda x: (x[0], x[1][0],
         x[1][1][0],x[1][1][1],x[1][1][2],x[1][1][3],x[1][1][4],x[1][1][5],x[1][1][6],x[1][1][7]))\
+    .sortBy(lambda x: x[1], ascending=False)\
     .map(lambda x: formatOutput(x))\
-    .top(10)
-print distanceData
+    .coalesce(1)\
+    .saveAsTextFile("output.tsv")
