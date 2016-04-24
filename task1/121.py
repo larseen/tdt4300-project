@@ -11,5 +11,5 @@ dataWithoutWhite = data.map(lambda x: x.split('\n')[0].split('\t'))
 dataTouples = dataWithoutWhite.map(
     lambda x: (x[3], x[4]))
 result = dataTouples.map(
-    lambda x: datetime.strptime(x[0], '%Y-%m-%d %H:%M:%S') - timedelta(minutes=int(x[1]))).map(
+    lambda x: datetime.strptime(x[0], '%Y-%m-%d %H:%M:%S') + timedelta(minutes=int(x[1]))).map(
     lambda x: str(x))
