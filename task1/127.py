@@ -47,10 +47,14 @@ distanceData = dataWithoutWhite\
     .filter(lambda x: len(x[1]) > 3)\
     .map(lambda x: (x[0], (computeDistance(list(x[1])))))\
     .filter(lambda x: x[1] > 50)\
+    .sortBy(lambda x: x[1], ascending=False)\
+    .take(100)
+
+distanceAndUserData = sc.parallelize(distanceData)\
     .join(userData)\
     .map(lambda x: (x[0], x[1][0],
         x[1][1][0],x[1][1][1],x[1][1][2],x[1][1][3],x[1][1][4],x[1][1][5],x[1][1][6],x[1][1][7]))\
-    .sortBy(lambda x: x[1], ascending=False)\
     .map(lambda x: formatOutput(x))\
     .coalesce(1)\
     .saveAsTextFile("output.tsv")
+
