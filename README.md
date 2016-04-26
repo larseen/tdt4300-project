@@ -12,6 +12,15 @@ The code in this repository assumes that you have the following files in this di
 
 ###Task1
 
+```bash
+$ python <tasknr>.py
+```
+
+Example
+```bash
+$ python 127.py
+```
+
 ###Task2
 
 ```bash
