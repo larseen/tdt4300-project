@@ -41,3 +41,4 @@ numCities = cityData \
         .map(lambda x: (x[0], x[4])) \
         .distinct() \
         .count()
+print numUserIds, numCheckins, numSessions, numCountries, numCities

@@ -20,4 +20,4 @@ dataTouples = dataWithoutWhite\
     .groupByKey()\
     .map(lambda x: (x[0], len(x[1])))
 
-print(dataTouples.take(10))
+print dataTouples.take(10)
