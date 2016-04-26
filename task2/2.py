@@ -57,11 +57,11 @@ def analyzeTweet(tweets):
     for word in negativeWords:
         wordDict[word] = -1
 
-    tweetsList = tweets.split(' ')
+    words = tweets.split(' ')
     score = 0
-    for tweet in tweetsList:
-        if tweet in wordDict:
-            score += wordDict[tweet]
+    for word in words:
+        if word in wordDict:
+            score += wordDict[word]
     return score
 
 def formatOutput(data):
