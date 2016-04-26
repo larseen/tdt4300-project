@@ -4,6 +4,8 @@ import sys
 import re, string
 import calendar
 
+sc = SparkContext("local[*]", "tdt4300")
+
 ##
 #
 # INPUT ARGUMENTS
@@ -49,10 +51,18 @@ def mergeTweets(a, b):
     return ''.join([a," ",b])
 
 def analyzeTweet(tweets):
+    wordDict = {}
+    for word in positiveWords:
+        wordDict[word] = 1
+    for word in negativeWords:
+        wordDict[word] = -1
+
     tweetsList = tweets.split(' ')
-    numPos = len([i for i in tweetsList if i in positiveWords])
-    numNeg = len([i for i in tweetsList if i in negativeWords])
-    return numPos - numNeg
+    score = 0
+    for tweet in tweetsList:
+        if tweet in wordDict:
+            score += wordDict[tweet]
+    return score
 
 def formatOutput(data):
     return '  '.join(str(d) for d in data)
