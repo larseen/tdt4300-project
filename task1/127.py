@@ -53,7 +53,8 @@ distanceData = dataWithoutWhite\
 distanceAndUserData = sc.parallelize(distanceData)\
     .join(userData)\
     .map(lambda x: (x[0], x[1][0],
-        x[1][1][0],x[1][1][1],x[1][1][2],x[1][1][3],x[1][1][4],x[1][1][5],x[1][1][6],x[1][1][7]))\
+    x[1][1][0],x[1][1][1],x[1][1][2],
+    x[1][1][3],x[1][1][4],x[1][1][5],x[1][1][6],x[1][1][7]))\
     .map(lambda x: formatOutput(x))\
     .coalesce(1)\
     .saveAsTextFile("output.tsv")
