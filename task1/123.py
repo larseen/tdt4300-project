@@ -45,3 +45,4 @@ cartUserCity = userCoordData.cartesian(cityCoordData) \
             (c1, con1, h1) if h1 < h2 else (c2, con2, h2))
 
 result = cartUserCity
+print result.take(10)
